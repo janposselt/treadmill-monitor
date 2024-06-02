@@ -1,6 +1,6 @@
 # Treadmill-Monitor
 
-An implementation using WebBLE and FTMS to control a treadmill from a browser.
+An implementation using Web Bluetooth and FTMS to control a treadmill from a browser.
 
 # Disclaimer
 
