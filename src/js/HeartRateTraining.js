@@ -8,6 +8,9 @@ export class HeartRateTraining {
         this.maxSpeed = 14;
         this.treadmillCommands = treadmillCommands;
         this.currentSpeed = 0;
+        this.tolerance = 5;
+        this.smallAdjustment = 0.1;
+        this.largeAdjustment = 0.5;
     }
 
     handleHeartRateChanged(heartRate) {
@@ -28,18 +31,27 @@ export class HeartRateTraining {
         const averageHeartRate = this.calculateAverageHeartRate();
         let newSpeed = this.currentSpeed;
 
-        if (averageHeartRate < this.targetHeartRate - 5) {
-            newSpeed += 0.5;
-        } else if (averageHeartRate > this.targetHeartRate + 5) {
-            newSpeed -= 0.5;
+        if (averageHeartRate < this.targetHeartRate - this.tolerance) {
+            if (averageHeartRate < this.targetHeartRate - 2 * this.tolerance) {
+                newSpeed += this.largeAdjustment;
+            } else {
+                newSpeed += this.smallAdjustment;
+            }
+        } else if (averageHeartRate > this.targetHeartRate + this.tolerance) {
+            if (averageHeartRate > this.targetHeartRate + 2 * this.tolerance) {
+                newSpeed -= this.largeAdjustment;
+            } else {
+                newSpeed -= this.smallAdjustment;
+            }
         }
 
         newSpeed = Math.max(1, Math.min(newSpeed, this.maxSpeed));
 
-        if (newSpeed != this.currentSpeed) {
+        if (newSpeed !== this.currentSpeed) {
             await this.treadmillCommands.setSpeed(newSpeed);
         }
     }
+
 
     startHFTraining() {
         if (!this.trainingInterval) {
