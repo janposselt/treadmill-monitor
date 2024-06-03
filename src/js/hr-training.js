@@ -20,7 +20,7 @@ treadmillControl.addDataHandler(treadmillData => {
 
 document.querySelector('#toggleConnection').addEventListener('click', async function() {
     if(!treadmillControl.connected()) {
-        document.querySelector('#toggleConnection').textContent = 'Verbinden';
+        document.querySelector('#toggleConnection').textContent = 'Verbindung trennen';
 
         await treadmillControl.connect();
         await treadmillCommands.requestControl();
@@ -28,7 +28,7 @@ document.querySelector('#toggleConnection').addEventListener('click', async func
         monitor.setDeviceName(treadmillControl.device.name);
     }
     else {
-        document.querySelector('#toggleConnection').textContent = 'Verbindung trennen';
+        document.querySelector('#toggleConnection').textContent = 'Verbinden';
         treadmillControl.disconnect();
         monitor.setDeviceName('Nicht verbunden');
     }
