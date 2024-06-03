@@ -35,7 +35,10 @@ export class HeartRateTraining {
         }
 
         newSpeed = Math.max(1, Math.min(newSpeed, this.maxSpeed));
-        await this.treadmillCommands.setSpeed(newSpeed);
+
+        if (newSpeed != this.currentSpeed) {
+            await this.treadmillCommands.setSpeed(newSpeed);
+        }
     }
 
     startHFTraining() {
