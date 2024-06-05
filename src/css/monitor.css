@@ -1,0 +1,94 @@
+body {
+    background-color: #b0e0e6; /* Pastellblauer Hintergrund */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    height: 100%;
+}
+
+.upper-half, .lower-half {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.upper-half {
+    position: relative;
+    width: 100%;
+    height: 50%;
+    text-align: center;
+}
+
+.upper-half h1 {
+    font-size: 3em;
+    margin: 0;
+}
+
+.upper-half h2 {
+    font-size: 2em;
+    margin: 0;
+}
+
+.controls {
+    position: relative;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.controls button {
+    margin: 5px 0;
+    padding: 10px;
+    font-size: 1em;
+}
+
+.device-name {
+    margin-top: 10px;
+    font-size: 1em;
+    text-align: left;
+}
+
+.tiles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    width: 100%;
+    height: 80%;
+    padding: 10px;
+}
+
+.tile {
+    background-color: #87cefa; /* Etwas dunkler als der Hintergrund */
+    border: 2px solid #ffffff; /* Weißer Rand */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.tile .title {
+    font-size: 0.8em;
+    color: rgba(0, 0, 0, 0.5); /* Dezenter Hintergrund */
+    align-self: flex-start;
+    padding-bottom: 5px;
+}
+
+.tile .value {
+    font-size: 1.4em;
+    font-weight: bold;
+}
