@@ -9,8 +9,10 @@ export class HeartRateTraining {
         this.treadmillCommands = treadmillCommands;
         this.currentSpeed = 0;
         this.tolerance = 5;
-        this.smallAdjustment = 0.1;
+        this.smallAdjustment = 0.2;
         this.largeAdjustment = 0.5;
+        this.smallTimeout = 5000;
+        this.largeTimeout = 10000;
     }
 
     handleHeartRateChanged(heartRate) {
@@ -31,17 +33,23 @@ export class HeartRateTraining {
         const averageHeartRate = this.calculateAverageHeartRate();
         let newSpeed = this.currentSpeed;
 
+        let timeout;
+
         if (averageHeartRate < this.targetHeartRate - this.tolerance) {
             if (averageHeartRate < this.targetHeartRate - 2 * this.tolerance) {
                 newSpeed += this.largeAdjustment;
+                timeout = this.largeTimeout;
             } else {
                 newSpeed += this.smallAdjustment;
+                timeout = this.smallTimeout;
             }
         } else if (averageHeartRate > this.targetHeartRate + this.tolerance) {
             if (averageHeartRate > this.targetHeartRate + 2 * this.tolerance) {
                 newSpeed -= this.largeAdjustment;
+                timeout = this.largeTimeout;
             } else {
                 newSpeed -= this.smallAdjustment;
+                timeout = this.smallTimeout;
             }
         }
 
@@ -50,20 +58,22 @@ export class HeartRateTraining {
         if (newSpeed !== this.currentSpeed) {
             await this.treadmillCommands.setSpeed(newSpeed);
         }
+
+       this.trainingInterval = setTimeout(this.adjustSpeed.bind(this), timeout);
     }
 
 
     startHFTraining() {
         if (!this.trainingInterval) {
             this.enableAdjustSpeed = true;
-            this.trainingInterval = setInterval(this.adjustSpeed.bind(this), 10000);
+            this.trainingInterval = setTimeout(this.adjustSpeed.bind(this), 0);
         }
     }
 
     stopHFTraining() {
         if (this.trainingInterval) {
             this.enableAdjustSpeed = false;
-            clearInterval(this.trainingInterval);
+            clearTimeout(this.trainingInterval);
             this.trainingInterval = null;
         }
     }
