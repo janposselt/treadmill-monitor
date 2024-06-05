@@ -1,7 +1,8 @@
 import { HrMonitor } from "./HrMonitor.js";
-import { TreadmillControl } from "./TreadmillControl.js";
+import { TreadmillControl , TreadmillData} from "./TreadmillControl.js";
 import { TreadmillCommands } from "./TreadmillCommands.js";
 import { HeartRateTraining } from "./HeartRateTraining.js";
+import { Workout, Segment } from "./Workout.js";
 
 let monitor = new HrMonitor();
 
@@ -34,9 +35,8 @@ document.querySelector('#toggleConnection').addEventListener('click', async func
     }
 });
 
-document.querySelector('#setTargetHr').addEventListener('click', function() {
-    let targetHr = window.prompt('Ziel HF');
-
+function setTargetHeartRate(targetHr) {
+    
     if (targetHr && !isNaN(targetHr)) {
         targetHr = parseInt(targetHr, 10);
         monitor.setTargetHeartRate(targetHr);
@@ -47,6 +47,12 @@ document.querySelector('#setTargetHr').addEventListener('click', function() {
         hrTraining.targetHeartRate = null;
         monitor.setTargetHeartRate('--');
     }
+}
+
+document.querySelector('#setTargetHr').addEventListener('click', function() {
+    let targetHr = window.prompt('Ziel HF');
+
+    setTargetHeartRate(targetHr);
 });
 
 document.querySelector('#toggleHrTraining').addEventListener('click', (function() {
@@ -76,3 +82,59 @@ treadmillControl.addDataHandler(treadmillData => {
    hrTraining.handleHeartRateChanged(treadmillData.hr);
    document.querySelector('#avgHr').textContent = hrTraining.calculateAverageHeartRate().toFixed(0);
 });
+
+const segments = [
+    new Segment({ targetHeartRate: 137, duration: 10*60 }),
+    new Segment({ targetHeartRate: 154, duration: 8*60 }),
+    new Segment({ targetHeartRate: 124, duration: 3*60 }),
+    new Segment({ targetHeartRate: 154, duration: 8*60 }),
+    new Segment({ targetHeartRate: 124, duration: 3*60 }),
+    new Segment({ targetHeartRate: 154, duration: 8*60 }),
+    new Segment({ targetHeartRate: 124, duration: 3*60 }),
+    new Segment({ targetHeartRate: 154, duration: 8*60 }),
+    new Segment({ targetHeartRate: 137, duration: 10*60 }),
+];
+
+const workout = new Workout(segments);
+
+workout.on('segmentChange', (event) => {
+    let segment = event.segment;
+    let index = event.index;
+
+    document.querySelector('#currentSegment').textContent = JSON.stringify(event.segment);
+    document.querySelector('#nextSegment').textContent = segments.length > index ? JSON.stringify(segments[index + 1]) : "";
+    document.querySelector('#currentSegmentIndex').textContent = index + 1;
+    document.querySelector('#numberOfSegments').textContent = segments.length;
+
+    if (segment.targetHeartRate !== undefined) {
+        setTargetHeartRate(segment.targetHeartRate);
+        hrTraining.stopHFTraining();
+        hrTraining.startHFTraining();
+    }
+    else {
+        hrTraining.stopHFTraining();
+    }
+
+    if (segment.targetSpeed) {
+        treadmillCommands.setSpeed(segment.targetSpeed);
+    }
+});
+
+workout.on('workoutComplete', () => {
+    treadmillCommands.setSpeed(4);
+    hrTraining.stopHFTraining();
+});
+
+document.querySelector('#toggleWorkout').addEventListener('click', function() {
+    if (!workout.running) {
+        workout.start();
+
+        treadmillControl.addDataHandler((treadmillData) => {
+            workout.update(treadmillData);
+        })
+    }
+    else {
+        workout.stop();
+    }
+});
+

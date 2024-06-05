@@ -107,11 +107,17 @@
             <button id="toggleConnection">Verbinden</button>
             <button id="setTargetHr">Ziel HR setzen</button>
             <button id="toggleHrTraining">HR Training starten</button>
+            <button id="toggleWorkout">Workout starten</button>
         </div>
         <div class="upper-half">
             <div class="device-name" id="device-name">Gerät: Nicht verbunden</div>
             <h1 id="avgHr">-- bpm</h1>
             <h2 id="target-heart-rate">Ziel: -- bpm</h2>
+            <div>
+                aktuell <span id="currentSegment"></span><br />
+                nächstes <span id="nextSegment"></span><br />
+                Position <span id="currentSegmentIndex">x</span>/<span id="numberOfSegments">y</span>
+            </div>
         </div>
         <div class="lower-half">
             <div class="tiles">
