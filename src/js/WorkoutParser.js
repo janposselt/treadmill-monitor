@@ -52,25 +52,60 @@ export class WorkoutParser {
 
     parse(text) {
         const segments = [];
-        const repeatPattern = /(\d+)x\(([^)]+)\)/g;
-        let match;
+        let index = 0;
 
-        while ((match = repeatPattern.exec(text)) !== null) {
-            const repeatCount = parseInt(match[1]);
-            const repeatSegments = match[2].split(',').map(segmentStr => this.parseSegment(segmentStr));
+        while (index < text.length) {
+            if (text[index] === '(') {
+                const closingIndex = this.findClosingParenthesis(text, index);
+                const nestedText = text.substring(index + 1, closingIndex);
+                const nestedSegments = this.parse(nestedText);
+                segments.push(...nestedSegments);
+                index = closingIndex + 1;
+            } else {
+                let repeatMatch = text.substring(index).match(/^(\d+)x\(/);
+                if (repeatMatch) {
+                    const repeatCount = parseInt(repeatMatch[1]);
+                    const closingIndex = this.findClosingParenthesis(text, index + repeatMatch[0].length - 1);
+                    const repeatText = text.substring(index + repeatMatch[0].length, closingIndex);
+                    const repeatSegments = this.parse(repeatText);
 
-            for (let i = 0; i < repeatCount; i++) {
-                segments.push(...repeatSegments);
+                    for (let i = 0; i < repeatCount; i++) {
+                        segments.push(...repeatSegments);
+                    }
+                    index = closingIndex + 1;
+                } else {
+                    let endIndex = text.indexOf(',', index);
+                    if (endIndex === -1) endIndex = text.length;
+
+                    const segmentStr = text.substring(index, endIndex).trim();
+                    if (segmentStr) {
+                        segments.push(this.parseSegment(segmentStr));
+                    }
+                    index = endIndex + 1;
+                }
             }
-        }
-
-        const mainSegments = text.replace(repeatPattern, '').split(',').map(segmentStr => segmentStr.trim()).filter(Boolean);
-        for (const segmentStr of mainSegments) {
-            segments.push(this.parseSegment(segmentStr));
         }
 
         return segments;
     }
+
+    findClosingParenthesis(text, openIndex) {
+        let closeIndex = openIndex;
+        let counter = 1;
+
+        while (counter > 0 && closeIndex < text.length - 1) {
+            closeIndex++;
+            if (text[closeIndex] === '(') {
+                counter++;
+            } else if (text[closeIndex] === ')') {
+                counter--;
+            }
+        }
+
+        if (counter !== 0) {
+            throw new Error('Ungültiges Format: Klammern sind nicht ausgeglichen');
+        }
+
+        return closeIndex;
+    }
 }
-
-
