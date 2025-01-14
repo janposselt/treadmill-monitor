@@ -59,4 +59,14 @@ export class TreadmillCommands {
             console.error('Fehler beim Lesen des unterstützten Steigungsbereich', error);
         }
     }
+
+    async setInclination(value) {
+        const buffer = new ArrayBuffer(3);
+        const view = new DataView(buffer);
+        const uint8Value = 3;
+        const int16Value = value * 10;
+        view.setUint8(0, uint8Value);
+        view.setInt16(1, int16Value, true);
+        await this.treadmillControl.sendCommand(buffer);
+    }
 }
